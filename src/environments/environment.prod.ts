@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiBaseUrl: 'https://YOUR-DOTNET-API.azurewebsites.net'
+  apiBaseUrl: 'https://dotnetinterview-bnbvcyh2dke0fvff.southeastasia-01.azurewebsites.net/'
 };
