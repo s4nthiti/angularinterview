@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, ElementRef, inject, signal, viewChild } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
@@ -48,6 +48,8 @@ export class UserForm {
     OTHER
   ];
 
+  readonly datePicker = viewChild<ElementRef<HTMLInputElement>>('datePicker');
+
   readonly profilePreview = signal<string | null>(null);
   readonly profileFileName = signal<string | null>(null);
   readonly submitting = signal(false);
@@ -80,6 +82,25 @@ export class UserForm {
   isInvalid(name: string): boolean {
     const c = this.form.get(name);
     return !!c && c.invalid && (c.dirty || c.touched);
+  }
+
+  openDatePicker(): void {
+    const el = this.datePicker()?.nativeElement;
+    if (!el) return;
+    if (typeof el.showPicker === 'function') {
+      try { el.showPicker(); return; } catch { /* fall through */ }
+    }
+    el.focus();
+    el.click();
+  }
+
+  onDatePicked(event: Event): void {
+    const value = (event.target as HTMLInputElement).value;
+    if (!value) return;
+    const [yyyy, mm, dd] = value.split('-');
+    const formatted = `${dd}/${mm}/${yyyy}`;
+    this.form.patchValue({ birthDay: formatted });
+    this.form.get('birthDay')!.markAsDirty();
   }
 
   onFileSelected(event: Event): void {
@@ -152,5 +173,7 @@ export class UserForm {
     this.profileFileName.set(null);
     const fileInput = document.getElementById('profileFile') as HTMLInputElement | null;
     if (fileInput) fileInput.value = '';
+    const dp = this.datePicker()?.nativeElement;
+    if (dp) dp.value = '';
   }
 }

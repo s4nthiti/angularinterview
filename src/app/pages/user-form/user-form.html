@@ -1,96 +1,86 @@
 <section class="form-page">
   <div class="form-card">
-    <header class="form-card__header">
-      <h2>User Information</h2>
-      <p>All fields are required.</p>
-    </header>
-
     <form [formGroup]="form" (ngSubmit)="onSave()" novalidate>
       <div class="grid">
+
         <div class="field">
-          <label for="firstName">First Name <span class="req">*</span></label>
+          <label for="firstName">First Name</label>
           <input id="firstName" type="text" formControlName="firstName"
                  [class.invalid]="isInvalid('firstName')" autocomplete="given-name" />
           @if (isInvalid('firstName')) {
-            <small class="err">
-              @if (form.get('firstName')?.errors?.['required']) { First Name is required. }
-              @else if (form.get('firstName')?.errors?.['maxlength']) { First Name is too long. }
-            </small>
+            <small class="err">Please provide a valid First Name</small>
           }
         </div>
 
         <div class="field">
-          <label for="lastName">Last Name <span class="req">*</span></label>
+          <label for="lastName">Last Name</label>
           <input id="lastName" type="text" formControlName="lastName"
                  [class.invalid]="isInvalid('lastName')" autocomplete="family-name" />
           @if (isInvalid('lastName')) {
-            <small class="err">
-              @if (form.get('lastName')?.errors?.['required']) { Last Name is required. }
-              @else if (form.get('lastName')?.errors?.['maxlength']) { Last Name is too long. }
-            </small>
+            <small class="err">Please provide a valid Last Name</small>
           }
         </div>
 
         <div class="field">
-          <label for="email">Email <span class="req">*</span></label>
+          <label for="email">Email</label>
           <input id="email" type="email" formControlName="email"
                  [class.invalid]="isInvalid('email')" autocomplete="email" />
           @if (isInvalid('email')) {
-            <small class="err">
-              @if (form.get('email')?.errors?.['required']) { Email is required. }
-              @else if (form.get('email')?.errors?.['email']) { Email format is invalid. }
-            </small>
+            <small class="err">Please provide a valid Email</small>
           }
         </div>
 
         <div class="field">
-          <label for="phone">Phone <span class="req">*</span></label>
+          <label for="phone">Phone</label>
           <input id="phone" type="tel" formControlName="phone" maxlength="10"
-                 placeholder="0812345678"
                  [class.invalid]="isInvalid('phone')" autocomplete="tel" />
           @if (isInvalid('phone')) {
-            <small class="err">
-              @if (form.get('phone')?.errors?.['required']) { Phone is required. }
-              @else if (form.get('phone')?.errors?.['pattern']) { Phone must be 10 digits starting with 0. }
-            </small>
+            <small class="err">Please provide a valid Phone</small>
           }
         </div>
 
-        <div class="field field--full">
-          <label for="profileFile">Profile <span class="req">*</span></label>
-          <div class="profile-row">
-            <label class="browse-btn" for="profileFile">Browse</label>
+        <div class="field">
+          <label for="profileFile">Profile</label>
+          <div class="input-attach" [class.invalid]="isInvalid('profileBase64')">
+            <span class="input-attach__text">{{ profileFileName() ?? '' }}</span>
+            <label class="input-attach__btn" for="profileFile">Browse</label>
             <input id="profileFile" type="file" accept="image/*" (change)="onFileSelected($event)" hidden />
-            <span class="profile-row__name">{{ profileFileName() ?? 'No file selected' }}</span>
-            @if (profilePreview()) {
-              <img class="profile-row__preview" [src]="profilePreview()!" alt="Profile preview" />
-            }
           </div>
+          @if (profilePreview()) {
+            <img class="profile-preview" [src]="profilePreview()!" alt="Profile preview" />
+          }
           @if (isInvalid('profileBase64')) {
-            <small class="err">Profile image is required.</small>
+            <small class="err">Please selected any profile</small>
           }
         </div>
 
         <div class="field">
-          <label for="birthDay">Birth Day (DD/MM/YYYY) <span class="req">*</span></label>
-          <input id="birthDay" type="text" formControlName="birthDay" maxlength="10"
-                 placeholder="DD/MM/YYYY"
-                 [class.invalid]="isInvalid('birthDay')" />
+          <label for="birthDay">Birth Day</label>
+          <div class="input-attach" [class.invalid]="isInvalid('birthDay')">
+            <input id="birthDay" type="text" formControlName="birthDay" maxlength="10"
+                   placeholder="DD/MM/YYYY" inputmode="numeric" />
+            <button type="button" class="input-attach__btn input-attach__btn--icon"
+                    (click)="openDatePicker()" aria-label="Pick date">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                   stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+                <line x1="3" y1="10" x2="21" y2="10"></line>
+              </svg>
+            </button>
+            <input #datePicker type="date" class="hidden-date" (change)="onDatePicked($event)" />
+          </div>
           @if (isInvalid('birthDay')) {
-            <small class="err">
-              @if (form.get('birthDay')?.errors?.['required']) { Birth Day is required. }
-              @else if (form.get('birthDay')?.errors?.['birthDayFormat']) { Use format DD/MM/YYYY. }
-              @else if (form.get('birthDay')?.errors?.['birthDayInvalid']) { Date is not valid. }
-              @else if (form.get('birthDay')?.errors?.['birthDayFuture']) { Birth Day cannot be in the future. }
-            </small>
+            <small class="err">Please provide a valid Birth Day</small>
           }
         </div>
 
         <div class="field">
-          <label for="occupationSelect">Occupation <span class="req">*</span></label>
+          <label for="occupationSelect">Occupation</label>
           <select id="occupationSelect" formControlName="occupationSelect"
                   [class.invalid]="isInvalid('occupationSelect')">
-            <option value="" disabled>-- Select Occupation --</option>
+            <option value="" disabled></option>
             @for (opt of occupations; track opt) {
               <option [value]="opt">{{ opt === OTHER ? 'Other (specify)' : opt }}</option>
             }
@@ -100,39 +90,38 @@
                    placeholder="Type your occupation"
                    [class.invalid]="isInvalid('occupationOther')" />
             @if (isInvalid('occupationOther')) {
-              <small class="err">Please specify your occupation.</small>
+              <small class="err">Please specify your occupation</small>
             }
           }
           @if (isInvalid('occupationSelect')) {
-            <small class="err">Occupation is required.</small>
+            <small class="err">Please selected any Occupation</small>
           }
         </div>
 
-        <div class="field">
-          <label>Gender <span class="req">*</span></label>
+        <div class="field field--sex">
+          <label>Sex</label>
           <div class="radio-row">
             <label class="radio">
-              <input type="radio" formControlName="gender" value="Male" /> Male
+              <input type="radio" formControlName="gender" value="Male" />
+              <span>Male</span>
             </label>
             <label class="radio">
-              <input type="radio" formControlName="gender" value="Female" /> Female
-            </label>
-            <label class="radio">
-              <input type="radio" formControlName="gender" value="Other" /> Other
+              <input type="radio" formControlName="gender" value="Female" />
+              <span>Female</span>
             </label>
           </div>
           @if (isInvalid('gender')) {
-            <small class="err">Gender is required.</small>
+            <small class="err">Please select Sex</small>
           }
         </div>
       </div>
 
       <div class="actions">
-        <button type="button" class="btn btn--secondary" (click)="onClear()" [disabled]="submitting()">
-          Clear
-        </button>
-        <button type="submit" class="btn btn--primary" [disabled]="submitting()">
+        <button type="submit" class="btn btn--save" [disabled]="submitting()">
           {{ submitting() ? 'Saving...' : 'Save' }}
+        </button>
+        <button type="button" class="btn btn--clear" (click)="onClear()" [disabled]="submitting()">
+          Clear
         </button>
       </div>
     </form>
